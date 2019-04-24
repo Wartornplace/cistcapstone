@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("header.php");
+include("config.php");
 
 if(!isset($_SESSION['uid'])){
     echo "You must be logged in to view this page!";
@@ -12,8 +13,11 @@ if(!isset($_SESSION['uid'])){
 		$Bank = $_POST['Bank'];
 		$Village = $_POST['Village'];
 		$City = $_POST['City'];
-        $Food_needed = (100 * $Storehouse)+ (2000 * $Village) + (20000 * $City);
-		$money_needed = (150 * $Bank)+(100 * $Farm) + (100 * $Factory) + (2000 * $Village) + (20000 * $City);
+        $Food_needed = ((($building['Storehouse']+1) * (.3 * 3.4)) *($storeb * $Storehouse))+ ((($building['Village']+1) * (.3 * 3.34)) *($villageb * $Village))
+		 + ((($building['City']+1) * (.3 * 3.34)) *($cityb * $City));
+		$money_needed = ((($building['Bank']+1) * (.3 * 3.4)) *($bankb * $Bank))+ ((($building['Farm']+1) * (.3 * 3.5)) *($farmb * $Farm)) 
+		+ ((($building['Factory']+1) * (.3 * 3.5)) *($factb * $Factory)) + ((($building['Village']+1) * (.3 * 3.34)) *($villageb * $Village)) 
+		+ ((($building['City']+1) * (.3 * 3.34)) *($cityb * $City));
         if($Factory < 0 || $Farm < 0 || $Storehouse < 0 || $Bank < 0 || $Village < 0 || $City < 0){
             echo("You must Build a positive number of Buildings!");
         }elseif($resources['Food'] < $Food_needed){
@@ -52,8 +56,8 @@ if(!isset($_SESSION['uid'])){
         $Bank = $_POST['Bank'];
         $Village = $_POST['Village'];
 		$City = $_POST['City'];
-        $Food_gained =  (150 * $Storehouse) + (1600 * $Village) + (16000 * $City);
-        $Money_Gained = (150 * $Bank) +(100 * $Factory)+(80 * $Farm)+ (1600 * $Village) + (16000 * $City);
+        $Food_gained =  ($storeS * $Storehouse) + ($villageS * $Village) + ($cityS * $City);
+        $Money_Gained = ($bankS * $Bank) +($factS * $Factory)+($farmS * $Farm)+ ($villageS * $Village) + ($cityS * $City);
         if($Factory < 0 || $Farm < 0 || $Storehouse < 0 || $Bank < 0){
             echo("You must Demolish a positive number of buildings!");
         }elseif($Factory > $building['Factory'] || $Farm > $building['Farm'] || 
@@ -76,7 +80,7 @@ if(!isset($_SESSION['uid'])){
                                         `City`='".$building['City']."'
                                         WHERE `ID_building`='".$_SESSION['uid']."'") or die(mysqli_error($link));
             $resources['Food'] += $Food_gained;
-            $resources['Money'] += $Money_gained;
+            $resources['Money'] += $Money_Gained;
             $update_Food = mysqli_query($link, "UPDATE `resources` SET `Food`='".$resources['Food']."' 
                                         WHERE `ID_Resrc`='".$_SESSION['uid']."'") or die(mysqli_error($link));
             $update_Money = mysqli_query($link, "UPDATE `resources` SET `Money`='".$resources['Money']."' 
@@ -101,39 +105,39 @@ if(!isset($_SESSION['uid'])){
         <tr>
             <td>Factory</td>
             <td><?php echo number_format($building['Factory']); ?></td>
-            <td>100 Money</td>
+            <td><?php echo number_format((($building['Factory']+1)* (.3 * 3.5)) *$factb) ?> Money</td>
             <td><input type="text" name="Factory" value="0" /></td>
         </tr>   
         <tr>
             <td>Farm</td>
             <td><?php echo number_format($building['Farm']); ?></td>
-            <td>100 Money</td>
+            <td><?php echo number_format((($building['Farm']+1)* (.3 * 3.5)) *$farmb) ?> Money</td>
             <td><input type="text" name="Farm" value="0" /></td>
         </tr>     
         <tr>
             <td>Storehouse</td>
             <td><?php echo number_format($building['Storehouse']); ?></td>
-            <td>200 Food</td>
+            <td><?php echo number_format((($building['Storehouse']+1)* (.3 * 3.4)) *$storeb) ?> Food</td>
             <td><input type="text" name="Storehouse"  value="0"/></td>
         </tr>    
         <tr>
             <td>Bank</td>
             <td><?php echo number_format($building['Bank']); ?></td>
-            <td>200 Money</td>
+            <td><?php echo number_format((($building['Bank']+1)* (.3 * 3.4)) *$bankb) ?> Money</td>
             <td><input type="text" name="Bank" value="0"/></td>
         </tr>
         <td></td>
         <tr>
             <td>Village</td>
             <td><?php echo number_format($building['Village']); ?></td>
-            <td>2000 Food <br></br> 2000 Money</td>
+            <td><?php echo number_format((($building['Village']+1)* (.3 * 3.34)) *$villageb) ?> Food <br></br> <?php echo number_format((($building['Village']+1)* (.3 * 3.34)) *$villageb) ?> Money</td>
             <td><input type="text" name="Village" value="0"/></td>
         </tr>
         <td></td>
         <tr>
             <td>City</td>
             <td><?php echo number_format($building['City']); ?></td>
-            <td>20000 Food<br></br> 20000 Money</td>
+            <td><?php echo number_format((($building['City']+1)* (.3 * 3.34)) *$cityb) ?> Food<br></br> <?php echo number_format((($building['City']+1)* (.3 * 3.34)) *$cityb) ?> Money</td>
             <td><input type="text" name="City" value="0"/></td>
         </tr>
         <tr>
@@ -168,26 +172,26 @@ if(!isset($_SESSION['uid'])){
         <tr>
             <td>Storehouse</td>
             <td><?php echo number_format($building['Storehouse']); ?></td>
-            <td>150 Food</td>
+            <td>160 Food</td>
             <td><input type="text" name="Storehouse" value="0"/></td>
         </tr>
         <tr>
             <td>Bank</td>
             <td><?php echo number_format($building['Bank']); ?></td>
-            <td>150 Money</td>
+            <td>160 Money</td>
             <td><input type="text" name="Bank" value="0"/></td>
         </tr>
         <td></td>
         <tr>
             <td>Village</td>
-            <td><?php echo number_format($building['Bank']); ?></td>
+            <td><?php echo number_format($building['Village']); ?></td>
             <td>1600 Food <br></br> 1600 Money</td>
             <td><input type="text" name="Village" value="0"/></td>
         </tr>
         <td></td>
         <tr>
             <td>City</td>
-            <td><?php echo number_format($building['Bank']); ?></td>
+            <td><?php echo number_format($building['City']); ?></td>
             <td>16000 Food <br></br> 16000 Food</td>
             <td><input type="text" name="City" value="0"/></td>
         </tr>

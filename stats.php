@@ -37,7 +37,11 @@ if(!isset($_SESSION['uid'])){
             <br />
             <form action="battle.php" method="post">
             <?php
-            $attacks_check = mysqli_query($link, "SELECT `ID_log` FROM `logs` WHERE `Attacker`='".$_SESSION['uid']."' AND `Defender`='".$id."' AND `time`>'".(time() - 86400)."'") or die(mysqli_error($link));
+            $attacks_check = mysqli_query($link, "SELECT `ID_log` FROM `logs` WHERE `Defender`='".$id."' AND `time`>'".(time() - 86400)."'") or die(mysqli_error($link));
+            $village_check = mysqli_query($link, "SELECT `Village` FROM `buildings` WHERE `ID_Building` ='".$id."'") or die(mysqli_error($link));
+			$v_check = mysqli_fetch_assoc($village_check);
+			$city_check = mysqli_query($link, "SELECT `City` FROM `buildings` WHERE `ID_Building` ='".$id."'") or die(mysqli_error($link));
+			$c_check = mysqli_fetch_assoc($city_check);
             ?>
             <i>Attacks on <?php echo $s_user['username']; ?> in the last 24 hours: (<?php echo mysqli_num_rows($attacks_check); ?>/5)</i><br />
             <?php
@@ -46,8 +50,18 @@ if(!isset($_SESSION['uid'])){
             Number of Turns (1-10): <input type="text" name="turns" /> 
             <input type="submit" name="Money" value="Raid for Money" />
             <input type="submit" name="Food" value="Raid for Food" />
+            <?php
+				if($v_check['Village'] > 1){
+					?>
             <input type="submit" name="Village" value="Conquer a Village" /><b>Village Defense: <?php echo number_format($s_stats['Defense'] * 3.5); ?></b>
+				<?php
+				}
+				if($c_check['City'] > 1){
+				?>
             <input type="submit" name="City" value="Conquer a City" /><b>City Defense: <?php echo number_format($s_stats['Defense'] * 6.5); ?></b>
+				<?php
+				}
+				?>
             <input type="hidden" name="ID_User" value="<?php echo $id; ?>"/>
             <br />
             <br />

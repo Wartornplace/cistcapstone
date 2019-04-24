@@ -28,18 +28,19 @@ if(isset($_SESSION['uid'])){
 if(isset($_SESSION['uid'])){
     include("safe.php");
     ?>
-    &raquo; <a href="main.php">Stats</a><br /><br />
+    &raquo; <a href="index.php">Stats</a><br /><br />
     &raquo; <a href="rankings.php">To Battle!</a><br /><br />
     &raquo; <a href="units.php">Units</a><br /><br />
     &raquo; <a href="weapons.php">Weapons</a><br /><br />
     &raquo; <a href="buildings.php">Buildings</a><br /><br />
-    &raquo; <a href="logout.php">Logout</a>
+    &raquo; <a href="logout.php">Logout</a><br /><br />
+    &raquo; <a href="https://discord.gg/AKdMa4M">Discord</a>
     <?php
 }else{
 	
     ?>
     <form action="login.php" method="post">
-    Username: <input type="text" name="username"/><br />
+    Email: <input type="text" name="Email"/><br />
     Password: <input type="password" name="password"/><br />
     <input type="submit" name="login" value="login"/>
     </form>

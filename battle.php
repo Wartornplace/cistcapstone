@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("header.php");
+include("config.php");
 if(!isset($_SESSION['uid'])){
     echo "You must be logged in to view this page!";
 }else{
@@ -22,9 +23,9 @@ if(!isset($_SESSION['uid'])){
         	$bank_check = mysqli_query($link, "SELECT * FROM `buildings` WHERE `ID_Building`='".$id."'") or die(mysqli_error($link));
 			$bank_saved = mysqli_fetch_assoc($bank_check);
             $enemy_resources = mysqli_fetch_assoc($user_check);
-			$bank_s = 100 * $bank_saved['Bank'];
+			$bank_s = $basS * $bank_saved['Bank'];
 			$bank_minus_resources = $enemy_resources['Money'] - $bank_s;
-            $attack_effect = $turns * 0.1 * $resources['Attack'];
+            $attack_effect = $turns * $aep * $resources['Attack'];
             $defense_effect = $enemy_resources['Defense'];
             
             echo "You send your Soldiers into battle!<br><br>";
@@ -32,7 +33,7 @@ if(!isset($_SESSION['uid'])){
             echo "The enemy's Guards dealt " . number_format($defense_effect) . " damage!<br><br>";
             if($attack_effect > $defense_effect){
                 $ratio = ($attack_effect - $defense_effect)/$attack_effect * $turns;
-                $ratio = min($ratio,.15);
+                $ratio = min($ratio,$mratio);
                 $Money_stolen = floor($ratio * $bank_minus_resources);
                 echo "You won the battle! You stole " . $Money_stolen . " Money!";
                 $battle1 = mysqli_query($link, "UPDATE `resources` SET `Money`=`Money`-'".$Money_stolen."' WHERE `ID_Resrc`='".$id."'") or die(mysqli_error($link));
@@ -61,9 +62,9 @@ if(!isset($_SESSION['uid'])){
         	$storehouse_check = mysqli_query($link, "SELECT * FROM `buildings` WHERE `ID_Building`='".$id."'") or die(mysqli_error($link));
 			$storehouse_saved = mysqli_fetch_assoc($storehouse_check);
             $enemy_resources = mysqli_fetch_assoc($user_check);
-			$storehouse_s = 100 * $storehouse_saved['Storehouse'];
+			$storehouse_s = $basS * $storehouse_saved['Storehouse'];
 			$storehouse_minus_resources = $enemy_resources['Food'] - $storehouse_s;
-            $attack_effect = $turns * 0.1 * $resources['Attack'];
+            $attack_effect = $turns * $aep * $resources['Attack'];
             $defense_effect = $enemy_resources['Defense'];
             
             echo "You send your Soldiers into battle!<br><br>";
@@ -71,7 +72,7 @@ if(!isset($_SESSION['uid'])){
             echo "The enemy's Guards dealt " . number_format($defense_effect) . " damage!<br><br>";
             if($attack_effect > $defense_effect){
                 $ratio = ($attack_effect - $defense_effect)/$attack_effect * $turns;
-                $ratio = min($ratio,.15);
+                $ratio = min($ratio,$mratio);
                 $Food_stolen = floor($ratio * $storehouse_minus_resources);
                 echo "You won the battle! You stole " . $Food_stolen . " Food!";
                 $battle1 = mysqli_query($link, "UPDATE `resources` SET `Food`=`Food`-'".$Food_stolen."' WHERE `ID_Resrc`='".$id."'") or die(mysqli_error($link));
@@ -98,14 +99,14 @@ if(!isset($_SESSION['uid'])){
             echo ("You cannot attack yourself!");
         }else{
             $enemy_resources = mysqli_fetch_assoc($user_check);
-            $attack_effect = $turns * 0.1 * $resources['Attack'];
-            $defense_effect = $enemy_resources['Defense'] * 3.5 ;
+            $attack_effect = $turns * $aep * $resources['Attack'];
+            $defense_effect = $enemy_resources['Defense'] * $vdef ;
             
             echo "You send your Soldiers into battle!<br><br>";
             echo "Your Soldiers dealt " . number_format($attack_effect) . " damage!<br>";
             echo "The enemy's Guards dealt " . number_format($defense_effect) . " damage!<br><br>";
             if($attack_effect > $defense_effect){
-                $village_stolen = 1;
+                $village_stolen = $vcr;
                 echo "You won the battle! You conquered " . $village_stolen . " village!";
                 $battle1 = mysqli_query($link, "UPDATE `buildings` SET `Village`=`Village`-'".$village_stolen."' WHERE `ID_Building`='".$id."'") or die(mysqli_error($link));
                 $battle2 = mysqli_query($link, "UPDATE `buildings` SET `Village`=`Village`+'".$village_stolen."' WHERE `ID_Building`='".$_SESSION['uid']."'") or die(mysqli_error($link));
@@ -132,14 +133,14 @@ if(!isset($_SESSION['uid'])){
             echo ("You cannot attack yourself!");
         }else{
             $enemy_resources = mysqli_fetch_assoc($user_check);
-            $attack_effect = $turns * 0.1 * $resources['Attack'];
-            $defense_effect = $enemy_resources['Defense'] * 6.5 ;
+            $attack_effect = $turns * $aep * $resources['Attack'];
+            $defense_effect = $enemy_resources['Defense'] * $cdef ;
             
             echo "You send your Soldiers into battle!<br><br>";
             echo "Your Soldiers dealt " . number_format($attack_effect) . " damage!<br>";
             echo "The enemy's Guards dealt " . number_format($defense_effect) . " damage!<br><br>";
             if($attack_effect > $defense_effect){
-                $city_stolen = 1;
+                $city_stolen = $ccr;
                 echo "You won the battle! You conquered " . $city_stolen . " city!";
                 $battle1 = mysqli_query($link, "UPDATE `buildings` SET `City`=`City`-'".$city_stolen."' WHERE `ID_Building`='".$id."'") or die(mysqli_error($link));
                 $battle2 = mysqli_query($link, "UPDATE `buildings` SET `City`=`City`+'".$city_stolen."' WHERE `ID_Building`='".$_SESSION['uid']."'") or die(mysqli_error($link));

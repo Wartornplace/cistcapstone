@@ -1,24 +1,44 @@
 <?php
 
-$income = (2 * pow($unit['Workers'], 0.5)) + (5 * $building['Factory']);
+include('config.php');
 
-$farming = 5 * pow($unit['Farmers'],0.5) + (5 * $building['Farm']);
+$income = ($workInc * pow($unit['Workers'], 0.5)) + ($facInc * $building['Factory']) + ($villIncFarm * $building['Village']) + ($cityIncFarm * $building['City']);
 
-$num1 = min($weapon['Guns'],$unit['Soldiers'] || $weapon['Tanks'],$unit['Drivers'] || $weapon['Bombers'],$unit['Pilots']);
+$farming = $farmerInc * pow($unit['Farmers'],0.5) + ($farmInc * $building['Farm']) + ($villIncFarm * $building['Village']) + ($cityIncFarm * $building['City']);
 
-if($num1 == $weapon['Guns'] || $num1 == $weapon['Tanks'] || $num1 == $weapon['Bombers']){
-    $attack = ((10 * $weapon['Guns']) + ($unit['Soldiers'] - $weapon['Guns'])) + ((20 * $weapon['Tanks']) + ($unit['Drivers'] - $weapon['Tanks'])) + ((50 * $weapon['Bombers']) + ($unit['Pilots'] - $weapon['Bombers'])) ;
+$soldier_attack = mysqli_query($link, "SELECT * FROM `units` WHERE `ID_Unit`='".$_SESSION['uid']."'") or die(mysqli_error($link));
+$u_check = mysqli_fetch_assoc($soldier_attack);
+$weapon_attack = mysqli_query($link, "SELECT * FROM `weapons` WHERE `ID_Weapons`='".$_SESSION['uid']."'") or die(mysqli_error($link));
+$w_check = mysqli_fetch_assoc($weapon_attack);
+
+
+if($u_check['Soldiers'] == $w_check['Guns']){
+    $attackS = $bad1 * $weapon['Guns'];
 }else{
-    $attack = (10 * $unit['Soldiers']) + (10 * $unit['Drivers']) + (10 * $unit['Pilots']);
+    $attackS = $bad2 * $u_check['Soldiers'];
 }
 
-$num2 = min($weapon['Barricades'],$unit['Guards']) || $building['Village'] || $building['City'];
-
-if($num2 == $weapon['Barricades']  || $num2 == $building['Village'] || $num2 == $building['City']){
-    $defense = ((10 * $weapon['Barricades'] + 20 * $building['Village'] + 50 * $building['City']) + ($unit['Guards'] - $weapon['Barricades'])) + (5 * $unit['Soldiers']) + (5 * $unit['Drivers']) + (5 * $unit['Pilots']);
+if($u_check['Drivers'] == $w_check['Tanks']){
+    $attackT = $tankA * $weapon['Tanks'];
 }else{
-    $defense = (10 * $unit['Guards']);
+    $attackT = $tankB * $u_check['Drivers'];
 }
+
+if($u_check['Pilots'] == $w_check['Bombers']){
+    $attackB = $bombA * $weapon['Bombers'];
+}else{
+    $attackB = $bombB * $u_check['Pilots'];
+}
+
+$attack = $attackS + $attackB + $attackT;
+
+if($u_check['Guards'] == $w_check['Barricades']){
+    $defenseG = $bad1 * $weapon['Barricades'] + ($offOD * $unit['Soldiers']) + ($offOD * $unit['Drivers']) + ($offOD * $unit['Pilots']);
+}else{
+    $defenseG = $bad2 * $unit['Guards'] + ($offOD * $unit['Soldiers']) + ($offOD * $unit['Drivers']) + ($offOD * $unit['Pilots']);
+}
+
+$defense = $defenseG + ($villdef * $building['Village']) + ($citydef * $building['City']);
 
 $update_stats = mysqli_query($link, "UPDATE `resources` SET 
                             `income`='".$income."',`farming`='".$farming."',

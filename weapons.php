@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("header.php");
+include("config.php");
 
 // Check for login
 if(!isset($_SESSION['uid'])){
@@ -12,7 +13,7 @@ if(!isset($_SESSION['uid'])){
         $barricades = $_POST['Barricades'];
 		$tanks = $_POST['Tanks'];
         $bombers = $_POST['Bombers'];
-        $money_neededG = (10 * $guns) + (10 * $barricades) + (100 * $tanks) + (100 * $bombers);
+        $money_neededG = ($wtr1b * $guns) + ($wtr1b * $barricades) + ($wtr2b * $tanks) + ($wtr2b * $bombers);
 		
         if($guns < 0 || $barricades < 0 || $tanks < 0 || $bombers < 0){
             echo ("You must buy a positive number of weapons!");
@@ -42,7 +43,7 @@ if(!isset($_SESSION['uid'])){
         $barricades = $_POST['Barricades'];
 		$tanks = $_POST['Tanks'];
         $bombers = $_POST['Bombers'];
-        $Money_gained = (8 * $guns) + (8 * $barricades) + (80 * $tanks) + (80 * $bombers);
+        $Money_gained = ($wtr1s * $guns) + ($wtr1s * $barricades) + ($wtr2s * $tanks) + ($wtr2s * $bombers);
         
         if($guns < 0 || $barricades < 0 || $tanks < 0 || $bombers < 0){
             echo("You must sell a positive number of weapons!");
